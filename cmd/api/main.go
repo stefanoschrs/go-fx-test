@@ -33,6 +33,7 @@ func getWebserverAddr() string {
 func main() {
 	fmt.Println()
 	fmt.Println("Starting fx application...")
+	fmt.Printf("PID: %d\n", os.Getpid())
 	fmt.Println()
 
 	app := fx.New(
