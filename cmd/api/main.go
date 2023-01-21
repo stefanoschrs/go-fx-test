@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/stefanoschrs/go-fx-test/internal/web/controller"
@@ -16,6 +17,18 @@ import (
 	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"
 )
+
+func getWebserverAddr() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	// e.g 127.0.0.1:8080
+	if !strings.Contains(port, ":") {
+		port = ":" + port
+	}
+	return port
+}
 
 func main() {
 	fmt.Println()
@@ -33,7 +46,7 @@ func main() {
 
 		fx.Invoke(func(webserver *webserver.Webserver, logger *zap.Logger) {
 			logger.Debug("Webserver module invoked")
-			go webserver.Gin.Run()
+			go webserver.Gin.Run(getWebserverAddr())
 		}, func(ctrl *controller.Controller, logger *zap.Logger) {
 			logger.Debug("Controller module invoked")
 		}, func(logger *zap.Logger) {
@@ -53,11 +66,7 @@ func main() {
 	go func() {
 		time.Sleep(5 * time.Second)
 
-		port := os.Getenv("PORT")
-		if port == "" {
-			port = "8080"
-		}
-		res, err := resty.New().R().Get(fmt.Sprintf("http://localhost:%s/ping", port))
+		res, err := resty.New().R().Get(fmt.Sprintf("http://%s/ping", getWebserverAddr()))
 		if err != nil {
 			log.Fatal(fmt.Errorf("resty.Get: %w", err))
 		}
