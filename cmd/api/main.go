@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/stefanoschrs/go-fx-test/internal/database"
 	"github.com/stefanoschrs/go-fx-test/internal/web/controller"
 	"github.com/stefanoschrs/go-fx-test/internal/web/router"
 	"github.com/stefanoschrs/go-fx-test/internal/web/webserver"
@@ -40,6 +41,8 @@ func main() {
 		webserver.Module,
 		router.Module,
 		controller.Module,
+		database.Module,
+
 		fx.Provide(zap.NewExample),
 		fx.WithLogger(func(logger *zap.Logger) fxevent.Logger {
 			return &fxevent.ZapLogger{Logger: logger}
@@ -50,6 +53,8 @@ func main() {
 			go webserver.Gin.Run(getWebserverAddr())
 		}, func(ctrl *controller.Controller, logger *zap.Logger) {
 			logger.Debug("Controller module invoked")
+		}, func(database *database.Database, logger *zap.Logger) {
+			logger.Debug("Database module invoked")
 		}, func(logger *zap.Logger) {
 			logger.Debug("Logger module invoked")
 		}),

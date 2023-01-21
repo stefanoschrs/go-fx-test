@@ -9,6 +9,8 @@ import (
 
 func registerRoutes(webserver *webserver.Webserver, controller *controller.Controller) {
 	webserver.Gin.GET("/ping", controller.Ping)
+
+	webserver.Gin.GET("/something", controller.GetSomething)
 }
 
 var Module = fx.Options(fx.Invoke(registerRoutes))

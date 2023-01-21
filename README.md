@@ -4,6 +4,7 @@
 
 ## Libraries
 - HTTP Web Framework [Gin](https://github.com/gin-gonic/gin)
+- DB + ORM [GORM](https://github.com/go-gorm/gorm)
 - DI Framework [fx](https://github.com/uber-go/fx)
 - Logging [zap](https://github.com/uber-go/zap)
 
@@ -15,3 +16,8 @@
 5. **Easy to Test**: Fx makes it easy to test the application by allowing you to replace parts with mock versions for testing purposes.
 6. **Easy to Monitor**: Fx provides a way to monitor the status of the application and its parts, which makes it easy to identify and fix problems.
 7. **Easy to extend**: Fx allows you to easily add new functionality to the framework by adding custom hooks to the application's lifecycle and by adding custom options.
+
+## CHANGELOG
+### 2023-01-21
+- Added database & orm with GORM
+- Added a non-fx version of the web app for benchmarking

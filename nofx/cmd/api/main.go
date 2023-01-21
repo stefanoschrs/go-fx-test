@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/stefanoschrs/go-fx-test/nofx/internal/database"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 	"go.uber.org/zap"
@@ -31,13 +33,31 @@ func main() {
 	fmt.Printf("PID: %d\n", os.Getpid())
 	fmt.Println()
 
+	/**/
+	// Logger
+	/**/
+
 	logger := zap.NewExample()
+
+	/**/
+	// Database
+	/**/
+
+	db, err := database.New(logger)
+	if err != nil {
+		log.Fatal(fmt.Errorf("database.New: %w", err))
+	}
+
+	/**/
+	// Webserver
+	/**/
 
 	router := gin.New()
 	router.SetTrustedProxies(nil)
 
 	router.Use(func(c *gin.Context) {
 		c.Set("logger", logger)
+		c.Set("database", db)
 	})
 
 	router.GET("/ping", func(c *gin.Context) {
@@ -46,6 +66,24 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
+		})
+	})
+
+	router.GET("/something", func(c *gin.Context) {
+		l := c.MustGet("logger").(*zap.Logger)
+		l.Debug("Controller.GetSomething")
+
+		d := c.MustGet("database").(*database.Database)
+
+		number, err2 := d.GetRandomNumber()
+		if err2 != nil {
+			l.Error("database.GetRandomNumber", zap.Error(err2))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err2.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"number": number,
 		})
 	})
 
@@ -62,7 +100,7 @@ func main() {
 		fmt.Println("Testing Server: " + string(res.Body()))
 	}()
 
-	if err := router.Run(getWebserverAddr()); err != nil {
+	if err = router.Run(getWebserverAddr()); err != nil {
 		log.Fatal(fmt.Errorf("router.Run: %w", err))
 	}
 }
