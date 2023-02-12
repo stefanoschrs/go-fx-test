@@ -17,7 +17,45 @@
 6. **Easy to Monitor**: Fx provides a way to monitor the status of the application and its parts, which makes it easy to identify and fix problems.
 7. **Easy to extend**: Fx allows you to easily add new functionality to the framework by adding custom hooks to the application's lifecycle and by adding custom options.
 
+## Run
+
+```shell
+make run
+```
+
+## Benchmarks
+
+- Binary size  
+
+> make build
+
+| FX | No FX |
+| -- | -- |
+| 15M | 14M |
+
+- Idle
+
+> ./scripts/psrecord.sh <PID> nofx 20 load
+
+| FX | No FX |
+| -- | -- |
+| ![](./benchmarks/fx-cpu-memory-plot-600.idle.png) | ![](./benchmarks/nofx-cpu-memory-plot-600.idle.png) |
+
+- HTTP Requests
+
+> PORT=15000 make run
+> psrecord <PID> --include-children --interval 1 --duration 20 --plot benchmarks/fx-cpu-memory-plot-20.load.png & k6 run --vus 100 --duration 20s -e PORT=15000 ./scripts/load.k6.js
+> PORT=15001 make run-nofx
+> psrecord <PID> --include-children --interval 1 --duration 20 --plot benchmarks/nofx-cpu-memory-plot-20.load.png & k6 run --vus 100 --duration 20s -e PORT=15001 ./scripts/load.k6.js
+
+| FX | No FX |
+| -- | -- |
+| ![](./benchmarks/fx-cpu-memory-plot-20.load.png) | ![](./benchmarks/nofx-cpu-memory-plot-20.load.png) |
+| ![](./benchmarks/fx-k6-100.png) | ![](./benchmarks/nofx-k6-100.png) |
+
 ## CHANGELOG
 ### 2023-01-21
 - Added database & orm with GORM
 - Added a non-fx version of the web app for benchmarking
+- Added some basic cpu/memory benchmarks
+- Added some basic load tests with k6
