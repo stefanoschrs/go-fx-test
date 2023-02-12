@@ -32,6 +32,7 @@ make run
 | FX | No FX |
 | -- | -- |
 | 15M | 14M |
+| 5.9M (upx) | 5.7M (upx) |
 
 - Idle
 
